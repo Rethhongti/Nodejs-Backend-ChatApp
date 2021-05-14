@@ -5,6 +5,7 @@ const User = require('../model/userModel');
 const webToken = require('../webtoken');
 
 const key = require('../key');
+
 router.route('/register').post((req,res)=>{
     const newUser = new User({
         username : req.body.username,
@@ -18,27 +19,43 @@ router.route('/register').post((req,res)=>{
     });
 });
 
+router.route('/fectchUser').get(webToken.checkToken, (req,res)=>{
+    User.findOne({username: req.decoded.username},(err,result)=>{
+        if(err){
+            res.status(403).json(err);
+        }else{
+            res.status(200).json(result);
+        }
+        
+    });
+});
+
 router.route('/login').post((req,res)=>{
     User.findOne({username: req.body.username},(err,result)=>{
         if(err){
             res.send(err);
         }else{
             if(result === null){
-                res.sendStatus(403).json('Invalid Account');
+                res.status(403).json({msg: 'Invalid Account'});
             }else {
                 if(result.password === req.body.password){
                     var token = jwt.sign({username :req.body.username},key.secretkey,{expiresIn:"1h"});
                     res.json({
                         token : token,
-                        msg : "success"
+                        msg : "success",
                     });
-                    
                 }else{
-                    res.json('Incorrect password');
+                    res.json({msg:'Incorrect password'});
                 }
             }
         }
     });
+});
+
+router.route('/friends').get(webToken.checkToken,(req,res)=>{
+    User.find({username : {$ne : req.decoded.username}}).then((result)=>{
+        res.json(result);
+    })
 });
 
 router.route('/checkAccount/:email').get((req,res)=>{

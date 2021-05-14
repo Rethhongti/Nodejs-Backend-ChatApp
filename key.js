@@ -1,5 +1,3 @@
-const secretkey = "MyChatApp"
-
-module.exports = [
-    secretkey
-];
+module.exports = {
+    secretkey: "MyChatApp"
+};
