@@ -28,9 +28,9 @@ io.on('connection',function(socket){
     console.log("User Connected");
 
     socket.on('chatID',function(data){
-        socket.join(data['id']);
+        socket.join(data['_id']);
 
-        onlineUsers.push(data['id']);
+        onlineUsers.push(data['_id']);
 
         socket.broadcast.emit('onlineUsers', {
             'users': onlineUsers
